@@ -1,0 +1,222 @@
+{
+  "name": "Lead Capture System",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Get a free Quote",
+        "formDescription": "Fill in your details and we will contact you shortly",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name"
+            },
+            {
+              "fieldLabel": "Email"
+            },
+            {
+              "fieldLabel": "Phone"
+            },
+            {
+              "fieldLabel": "Message"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -320,
+        0
+      ],
+      "id": "015720a2-8bcc-45e7-ac39-e8d79e6801d6",
+      "name": "On form submission",
+      "webhookId": "f72e4f83-44e4-490b-a095-c35020e5e31c"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1G2pIw0ZR29WSnHhSzfg_HmWWbTIEKo5kXxycswwEDW8",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G2pIw0ZR29WSnHhSzfg_HmWWbTIEKo5kXxycswwEDW8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G2pIw0ZR29WSnHhSzfg_HmWWbTIEKo5kXxycswwEDW8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Email": "={{ $json.Email }}",
+            "Phone": "={{ $json.Phone }}",
+            "Message": "={{ $json.Message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        0
+      ],
+      "id": "3797ec07-8aa2-423b-a59b-1f858157a2ff",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fAGq0SYzPr1XI5gW",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "sameerahmii331@gmail.com",
+        "subject": "New Lead Received!",
+        "message": "=New lead from {{ $json.Name }}. Email: {{ $json.Email }}. Phone: {{ $json.Phone }}. Message: {{ $json.Message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        128,
+        0
+      ],
+      "id": "32511080-2994-4aab-9865-7c85dca87dd1",
+      "name": "Send a message",
+      "webhookId": "243a83ff-7ce6-412b-a182-901bb20ac21a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "Thank you for contacting us!",
+        "message": "={{ $('On form submission').item.json.Name }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        0
+      ],
+      "id": "7e0e231e-8334-4163-a804-84e8bff12d83",
+      "name": "Send a message1",
+      "webhookId": "d8dead93-fce6-494c-9607-e40fb8be3de4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "67e85adb-e8d1-4a44-81c1-b5a28a5819fc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6bd52121447317257c6175a866599be36f5dd1967c9b7432de9a1a5e794301e0"
+  },
+  "nodeGroups": [],
+  "id": "kSD1p4FHsjUO9qlL",
+  "tags": []
+}

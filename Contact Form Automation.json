@@ -1,0 +1,157 @@
+{
+  "name": "Contact Form Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Contact Us\n",
+        "formDescription": "We will get back to you soon",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name"
+            },
+            {
+              "fieldLabel": "Email"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -384,
+        0
+      ],
+      "id": "a4edd0fd-1c71-4727-8e2a-53ec80968b0f",
+      "name": "On form submission",
+      "webhookId": "d0f0d338-54a5-4312-8db2-09ba3b543f32"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1zRSvPkE5RzydB0VcQnCDWmB0q3jSWIsv-JCDJOAph6o",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1zRSvPkE5RzydB0VcQnCDWmB0q3jSWIsv-JCDJOAph6o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1zRSvPkE5RzydB0VcQnCDWmB0q3jSWIsv-JCDJOAph6o/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Email": "={{ $json.Email }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -160,
+        0
+      ],
+      "id": "dc09b5bf-7140-4f52-93cd-ea2b25dfaedb",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fAGq0SYzPr1XI5gW",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Thank you for contacting us",
+        "message": "=Hi {{ $json.Name }}, thank you for reaching out. We have received your message and will get back to you shortly.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        0
+      ],
+      "id": "03f0ec19-858b-4af8-8398-dd104d02316a",
+      "name": "Send a message",
+      "webhookId": "410418cb-445f-4579-b433-eef94373dbb6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a3df9175-8a10-45ee-9b20-c4b617b1ba67",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6bd52121447317257c6175a866599be36f5dd1967c9b7432de9a1a5e794301e0"
+  },
+  "nodeGroups": [],
+  "id": "eRurkQ22nHxGP3Ej",
+  "tags": []
+}

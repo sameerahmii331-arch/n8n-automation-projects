@@ -1,0 +1,240 @@
+{
+  "name": "CRM Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Customer Inquiry",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name"
+            },
+            {
+              "fieldLabel": "Email"
+            },
+            {
+              "fieldLabel": "Phone"
+            },
+            {
+              "fieldLabel": "Company"
+            },
+            {
+              "fieldLabel": "Message"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "84184078-aeef-49e5-9f3d-3f68bbb2f160",
+      "name": "On form submission",
+      "webhookId": "c4a5103f-5f48-4d0f-806b-665db1413e6a"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1hbeMPtJ08yn_AQE0AWbcPVCHYJBzOG7AfMbyakaT78w",
+          "mode": "list",
+          "cachedResultName": "CRM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hbeMPtJ08yn_AQE0AWbcPVCHYJBzOG7AfMbyakaT78w/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hbeMPtJ08yn_AQE0AWbcPVCHYJBzOG7AfMbyakaT78w/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('On form submission').item.json['Name'] }}",
+            "Email": "={{ $('On form submission').item.json.Email }}",
+            "Company": "={{ $('On form submission').item.json.Company }}",
+            "Message": "={{ $('On form submission').item.json.Message }}",
+            "Status": "New",
+            "Phone": "={{ $('On form submission').item.json['Phone'] }}\n"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "911bf515-fccf-4746-8735-6c28a09bb462",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fAGq0SYzPr1XI5gW",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "sameerahmii331@gmail.com",
+        "subject": "=New CRM Lead!",
+        "message": "=New lead from {{ $('On form submission').item.json[' Name'] }}. Company: {{ $('On form submission').item.json.Company }}. Email: {{ $('On form submission').item.json.Email }}. Phone: {{ $('On form submission').item.json.Phone }}. Message: {{ $('On form submission').item.json.Message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        -16
+      ],
+      "id": "f6c9114f-a031-4e5b-a2a0-8eb6ab95ea96",
+      "name": "Send a message",
+      "webhookId": "77ef1c97-e775-45ad-a5e4-80aa703c3103",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "Thank you for your inquiry!",
+        "message": "=Hi {{ $('On form submission').item.json[' Name'] }}, thank you for reaching out. We have received your inquiry and one of our team members will contact you within 24 hours.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        576,
+        -16
+      ],
+      "id": "48084aab-61c9-464f-822d-04daafceda0f",
+      "name": "Send a message1",
+      "webhookId": "d0031039-36d0-48dd-b791-a06a81f5725b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6905fc4d-2dc2-4eae-90a1-447c54cc38b7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6bd52121447317257c6175a866599be36f5dd1967c9b7432de9a1a5e794301e0"
+  },
+  "nodeGroups": [],
+  "id": "Iw3GudYJcGKiaq2i",
+  "tags": []
+}

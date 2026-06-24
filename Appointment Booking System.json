@@ -1,0 +1,230 @@
+{
+  "name": "Appointment Booking System",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Book an Appointment",
+        "formDescription": " Fill in your details and we will confirm your appointment shortly.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": " Name"
+            },
+            {
+              "fieldLabel": "Email"
+            },
+            {
+              "fieldLabel": "Phone"
+            },
+            {
+              "fieldLabel": "Date"
+            },
+            {
+              "fieldLabel": "Service"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d894b72a-7ec3-459a-824f-ad2f070a8a50",
+      "name": "On form submission",
+      "webhookId": "8c8b8da1-ed22-4ece-ad1c-0ab12a2bd578"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1cFG4FZ2ZJBRnbOJWB8s0smxvJ_M6rhxph1KS1b4d8vU",
+          "mode": "list",
+          "cachedResultName": "Appointments",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cFG4FZ2ZJBRnbOJWB8s0smxvJ_M6rhxph1KS1b4d8vU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cFG4FZ2ZJBRnbOJWB8s0smxvJ_M6rhxph1KS1b4d8vU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('On form submission').item.json[' Name'] }}",
+            "Email": "={{ $('On form submission').item.json.Email }}",
+            "Phone ": "={{ $('On form submission').item.json.Phone }}",
+            "Date": "={{ $('On form submission').item.json.Date }}",
+            "Service": "={{ $('On form submission').item.json.Service }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone ",
+              "displayName": "Phone ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service",
+              "displayName": "Service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e9ef2cba-90ec-4126-b319-067d12109071",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fAGq0SYzPr1XI5gW",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "Appointment Confirmed!",
+        "message": "= Hi {{ $('On form submission').item.json.Name }}, your appointment for {{ $('On form submission').item.json.Service }} on {{ $('On form submission').item.json.Date }} has been confirmed. We look forward to seeing you!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "dc12a770-83f1-4964-8a1d-735fe3bc9e28",
+      "name": "Send a message",
+      "webhookId": "62f4b78f-2592-4e40-9947-670ca6cc2458",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "sameerahmii331@gmail.com",
+        "subject": "New Appointment Booked!",
+        "message": "=New appointment from {{ $('On form submission').item.json.Name }}. Service: {{ $('On form submission').item.json.Service }}. Date: {{ $('On form submission').item.json.Date }}. Phone: {{ $('On form submission').item.json.Phone }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "710c5fdf-4486-460b-b413-964134d43b20",
+      "name": "Send a message1",
+      "webhookId": "5b0a577c-59fd-4e68-bbdd-543a357ec561",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "833053bf-3aab-48dd-baf1-96913b09b5f8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6bd52121447317257c6175a866599be36f5dd1967c9b7432de9a1a5e794301e0"
+  },
+  "nodeGroups": [],
+  "id": "tlJPl6lX2UCiOEnL",
+  "tags": []
+}

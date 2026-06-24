@@ -1,0 +1,159 @@
+{
+  "name": "AI Email Writer",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_GROQ_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $('Edit Fields').item.json.prompt }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        192,
+        0
+      ],
+      "id": "7763158d-dec2-42ef-a646-d2f9e887d8a2",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "formTitle": "AI Email Writer",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Recipient Name"
+            },
+            {
+              "fieldLabel": "Your Name"
+            },
+            {
+              "fieldLabel": "Email Topic"
+            },
+            {
+              "fieldLabel": "Tone"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "4242457a-2c62-4095-a880-a21ecee87ba0",
+      "name": "On form submission",
+      "webhookId": "ea268a27-ca71-4d6c-9332-44ffcb25bb83"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1be9489b-f497-4b6c-9ce7-1749a5c9d0a3",
+              "name": "prompt",
+              "value": "=Write a {{ $('On form submission').item.json.Tone }} email from {{ $('On form submission').item.json['Your Name'] }} to {{ $('On form submission').item.json['Recipient Name'] }} about {{ $('On form submission').item.json['Email Topic'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "9ce91470-6ac9-4a97-9564-8a2009277698",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json['Recipient Name'] }}@gmail.com",
+        "subject": "={{ $('On form submission').item.json['Email Topic'] }}",
+        "message": "={{ $json.choices[0].message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        0
+      ],
+      "id": "1589b3e6-42b4-43bf-9a74-5bfb0bacc5a1",
+      "name": "Send a message",
+      "webhookId": "bc9e2ad5-2d06-4ad6-9ec5-a7962940e8a4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "12b0f490-a61c-4106-ac0d-e0d34961d20a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6bd52121447317257c6175a866599be36f5dd1967c9b7432de9a1a5e794301e0"
+  },
+  "nodeGroups": [],
+  "id": "6ss7sfOpkvB129yR",
+  "tags": []
+}

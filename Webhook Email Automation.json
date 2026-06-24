@@ -1,0 +1,71 @@
+{
+  "name": "Webhook Email Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "ec27bdac-65da-439b-8952-5880d55f8b0c",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "37f50eb8-3a73-4fca-a38d-2e767153c9ad",
+      "name": "Webhook",
+      "webhookId": "ec27bdac-65da-439b-8952-5880d55f8b0c"
+    },
+    {
+      "parameters": {
+        "sendTo": "sameerahmii331@gmail.com",
+        "subject": "New Webhook Received",
+        "message": " Someone just triggered your webhook!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "69b57b0d-ce58-4ecd-abc9-c493b4f5743c",
+      "name": "Send a message",
+      "webhookId": "f0095c8b-d227-48fd-9e76-d620b09a8854",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0fb1808b-9830-41f8-99a1-90fac82cce2c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6bd52121447317257c6175a866599be36f5dd1967c9b7432de9a1a5e794301e0"
+  },
+  "nodeGroups": [],
+  "id": "rziSimTqJxSEKC5i",
+  "tags": []
+}

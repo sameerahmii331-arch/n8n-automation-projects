@@ -1,0 +1,250 @@
+{
+  "name": "Quote Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Get a Free Quote",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Client Name"
+            },
+            {
+              "fieldLabel": "Email"
+            },
+            {
+              "fieldLabel": "Service Required"
+            },
+            {
+              "fieldLabel": "Budget"
+            },
+            {
+              "fieldLabel": "Project Description"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "11ecb8cd-2639-40fa-b16f-c845d5e95c65",
+      "name": "On form submission",
+      "webhookId": "2dfdc5cb-c491-4c5d-a3cb-245f47e8c653"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "12LBc1oMCUXcaw5jX6WDdC9B0qO706yrqgGRmHkJsS7I",
+          "mode": "list",
+          "cachedResultName": "Quotes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12LBc1oMCUXcaw5jX6WDdC9B0qO706yrqgGRmHkJsS7I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12LBc1oMCUXcaw5jX6WDdC9B0qO706yrqgGRmHkJsS7I/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Client Name": "={{ $('On form submission').item.json['Client Name'] }}",
+            "Email": "={{ $('On form submission').item.json.Email }}",
+            "Service": "={{ $('On form submission').item.json['Service Required'] }}",
+            "Budget": "= {{ $('On form submission').item.json.Budget }}",
+            "Description": "={{ $('On form submission').item.json['Project Description'] }}",
+            "Date": "={{ $now }}",
+            "Status": "Pending"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Client Name",
+              "displayName": "Client Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service",
+              "displayName": "Service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "b9bbca25-39b7-43af-939c-6fdafdea8bfe",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fAGq0SYzPr1XI5gW",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "We received your quote request!",
+        "message": "=Hi {{ $('On form submission').item.json['Client Name'] }}, thank you for requesting a quote. We have received your request for {{ $('On form submission').item.json['Service Required'] }} with a budget of {{ $('On form submission').item.json.Budget }}. We will send you a detailed quote within 24 hours.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "ef46ec48-8aab-4862-8961-f4d46217746b",
+      "name": "Send a message",
+      "webhookId": "46e44f1a-043c-4e72-bc9f-2912365d4de5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "sameerahmii331@gmail.com",
+        "subject": "New Quote Request!",
+        "message": "=New quote request from {{ $('On form submission').item.json['Client Name'] }}. Service: {{ $('On form submission').item.json['Service Required'] }}. Budget: {{ $('On form submission').item.json.Budget }}. Email: {{ $('On form submission').item.json.Email }}. Description: {{ $('On form submission').item.json['Project Description'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "c6ee8058-c102-440d-8000-0ef752307ed4",
+      "name": "Send a message1",
+      "webhookId": "3a2832af-69f5-4313-83fd-dab44223e9d7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f00de864-c7fa-426c-a22d-6991cf86b240",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6bd52121447317257c6175a866599be36f5dd1967c9b7432de9a1a5e794301e0"
+  },
+  "nodeGroups": [],
+  "id": "8ud0kSogV7a6lzmt",
+  "tags": []
+}

@@ -1,0 +1,159 @@
+{
+  "name": "AI Resume Analyzer",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI Resume Analyzer",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Your Name"
+            },
+            {
+              "fieldLabel": "Email"
+            },
+            {
+              "fieldLabel": "Job Title Applying For"
+            },
+            {
+              "fieldLabel": "Paste Your Resume"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b46bd77d-8fcf-4cd5-91c8-1d058a570b21",
+      "name": "On form submission",
+      "webhookId": "bff91b81-94d6-4d41-a43c-912faec05c10"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "44f606b9-bf66-4c9f-9dda-3956053eecb3",
+              "name": "prompt",
+              "value": "=You are a professional resume reviewer. Analyze this resume for the position of {{ $('On form submission').item.json['Job Title Applying For'] }} and provide specific feedback on strengths, weaknesses and improvements. Resume: {{ $('On form submission').item.json['Paste Your Resume'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "2bdfb83f-6c7d-4e22-a767-a15f36da6518",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_GROQ_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.prompt }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "e5f9395d-46b3-4b35-8ca7-78e5de8b4f85",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "Your Resume Analysis is Ready!",
+        "message": "={{ $json.choices[0].message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "f38ebbd1-5ef3-4985-83ff-817eb4d2c793",
+      "name": "Send a message",
+      "webhookId": "6a67025e-363d-4a5e-9ee1-1b2decb1fa5a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c6367f92-0545-484f-95e6-9a6fa464b0b9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6bd52121447317257c6175a866599be36f5dd1967c9b7432de9a1a5e794301e0"
+  },
+  "nodeGroups": [],
+  "id": "XKbil2IXbUIJdMAK",
+  "tags": []
+}

@@ -1,0 +1,161 @@
+{
+  "name": "AI Content Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI Content Generator",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Your Name "
+            },
+            {
+              "fieldLabel": "Email"
+            },
+            {
+              "fieldLabel": "Content Type"
+            },
+            {
+              "fieldLabel": "Topic"
+            },
+            {
+              "fieldLabel": "Tone"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cbd57d95-5610-42b9-b825-4ab4d933ee00",
+      "name": "On form submission",
+      "webhookId": "9e18a6e4-ce46-4c65-ac96-0a56e70ddc80"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8df4a6f9-b248-45c1-9db6-a060b3fd89e0",
+              "name": "prompt",
+              "value": "=You are a professional content writer. Write a {{ $('On form submission').item.json['Content Type'] }} about {{ $('On form submission').item.json.Topic }} in a {{ $('On form submission').item.json.Tone }} tone. Make it engaging, well structured and ready to publish.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "bf0797be-ace0-4e80-a516-551a8f5e69c4",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_GROQ_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.prompt }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "8a31d343-4f44-4cae-a138-8cf05743be01",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "=Your {{ $('On form submission').item.json['Content Type'] }} is Ready!",
+        "message": "=Hi  {{ $('On form submission').item.json['Your Name '] }}, here is your generated content about {{ $('On form submission').item.json.Topic }}: {{ $('HTTP Request').item.json.choices[0].message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "76786f40-d90c-4d30-b5d4-17548fae59fe",
+      "name": "Send a message",
+      "webhookId": "1565725b-d529-4b7b-a1fe-a350b020fafd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BzBSG6lf3XLRw0Vy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "28fd772d-525d-4ecc-97e0-671ca2b01901",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6bd52121447317257c6175a866599be36f5dd1967c9b7432de9a1a5e794301e0"
+  },
+  "nodeGroups": [],
+  "id": "2U76dKGMN7YAbNFq",
+  "tags": []
+}
