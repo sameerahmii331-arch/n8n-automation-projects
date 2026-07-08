@@ -1,0 +1,281 @@
+{
+  "name": "Complete PDF Agent System",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -96,
+        16
+      ],
+      "id": "9b225ad3-7c7d-49c2-b7f5-86675eeb0307",
+      "name": "When chat message received",
+      "webhookId": "fdff61c3-5f05-4252-9400-0a5dfdcec6fc"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "={{ $('Edit Fields').item.json.systemPrompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        736,
+        32
+      ],
+      "id": "b2752696-a1a5-4d1e-a138-6c3603bb7ca8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        272,
+        240
+      ],
+      "id": "8f564a97-19bf-4550-a1dd-6237ef671a93",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "bzXRYhxvcnSmcKkk",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        464,
+        272
+      ],
+      "id": "41da1683-9585-4446-8549-e07f0e595758",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        16
+      ],
+      "id": "dd46a8eb-5193-42d7-bdcd-7f4bde047d99",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "fileSelector": "C:\\Users\\Usewr\\.n8n-files\\SMB_University_120307_Networking_Fundamentals.pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        112,
+        16
+      ],
+      "id": "ee001012-b2f5-426c-9033-518c13b4000c",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ca3a5fc-a3c5-4ce1-b258-a004cb4814e5",
+              "name": "systemPrompt",
+              "value": "=You are a helpful AI assistant. Answer questions about this PDF document. PDF Content: {{ $('Extract from File').item.json.text.substring(0, 3000) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        16
+      ],
+      "id": "3ee792cd-5c65-494a-9755-02df24e4de6a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "sameerahmii331@gmail.com",
+        "subject": " PDF Chat Summary",
+        "message": "= {{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1296,
+        -112
+      ],
+      "id": "2b15a680-e7c6-4634-82b1-057b9791c913",
+      "name": "Send a message",
+      "webhookId": "decc6eb9-2555-4f85-b18c-3d375b6df47d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eaWnYHlPHwh1Ests",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1496b134-6aa2-4fdf-a69e-3751f3e29a2f",
+              "leftValue": "={{ $('When chat message received').item.json.chatInput }}",
+              "rightValue": "send summary",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        -80
+      ],
+      "id": "08cf9e9e-3e07-4798-b617-586ba1d8ce62",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "496d91da-923c-433d-a8cc-c4228dfc49b2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e6464d770950a4d5a66863f2bcc182df3d6e7fab50753144ed5ffe36dc38e919"
+  },
+  "nodeGroups": [],
+  "id": "szpKYnJUjDVGlpaT",
+  "tags": []
+}
