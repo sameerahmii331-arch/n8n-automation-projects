@@ -1,0 +1,314 @@
+{
+  "name": "AI Appointment Booking Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Book an Appointment",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name"
+            },
+            {
+              "fieldLabel": "Email"
+            },
+            {
+              "fieldLabel": "Phone"
+            },
+            {
+              "fieldLabel": "Service Type"
+            },
+            {
+              "fieldLabel": "Preferred Date"
+            },
+            {
+              "fieldLabel": "Preferred Time"
+            },
+            {
+              "fieldLabel": "Special Requests"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "721520b4-4577-4f48-8c98-7f678595f3e2",
+      "name": "On form submission",
+      "webhookId": "001e86f1-4907-4d80-8279-9dbd9d62086d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "50bb0bc2-d415-43b5-8e80-7b79faab799b",
+              "name": "prompt",
+              "value": "=You are a professional appointment booking assistant. A customer wants to book an appointment. Based on their details, write a warm, professional confirmation message and suggest any relevant preparation tips. Customer details: Name: {{ $('On form submission').item.json['Full Name'] }}, Service: {{ $('On form submission').item.json['Service Type'] }}, Date: {{ $('On form submission').item.json['Preferred Date'] }}, Time: {{ $('On form submission').item.json['Preferred Time'] }}, Special Requests: {{ $('On form submission').item.json['Special Requests'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "f3b2230e-a1c0-438a-888f-c2ce062232be",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "My Groq Api key"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.prompt }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "43e59211-04fc-4c5b-a6f0-89192b9203f6",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1MNEhHmV4a66SBKOJKxUtGUJIJQraclFz3b0E3tMVF28",
+          "mode": "list",
+          "cachedResultName": "Appointments AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MNEhHmV4a66SBKOJKxUtGUJIJQraclFz3b0E3tMVF28/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MNEhHmV4a66SBKOJKxUtGUJIJQraclFz3b0E3tMVF28/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name ": "={{ $('On form submission').item.json['Full Name'] }}",
+            "Email": "={{ $('On form submission').item.json.Email }}",
+            "Phone": "={{ $('On form submission').item.json.Phone }}",
+            "Service ": "={{ $('On form submission').item.json['Service Type'] }}",
+            "Date": "={{ $('On form submission').item.json['Preferred Date'] }}",
+            "Time": "={{ $('On form submission').item.json['Preferred Time'] }}",
+            "Special Requests": "={{ $('On form submission').item.json['Special Requests'] }}",
+            "Status": "Confirmed",
+            "Date Added": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name ",
+              "displayName": "Name ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service ",
+              "displayName": "Service ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Special Requests",
+              "displayName": "Special Requests",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Added",
+              "displayName": "Date Added",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        0
+      ],
+      "id": "635e2d7c-4b1d-46f1-8718-a41bccd95011",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9s3OHIbkOT10iAmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "Your Appointment is confirmed!",
+        "message": "=Hi {{ $('On form submission').item.json['Full Name'] }}, {{ $('HTTP Request').item.json.choices[0].message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        16
+      ],
+      "id": "c7db8687-06f4-401a-bdf5-f2bc202eb09b",
+      "name": "Send a message",
+      "webhookId": "bca18b49-ec14-41e2-b62a-e92bebbc30f6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eaWnYHlPHwh1Ests",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ec3bc26c-11a0-4d51-a93f-29cb9cedb782",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e6464d770950a4d5a66863f2bcc182df3d6e7fab50753144ed5ffe36dc38e919"
+  },
+  "nodeGroups": [],
+  "id": "qiADwgc3GY3h8qgo",
+  "tags": []
+}

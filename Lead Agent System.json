@@ -1,0 +1,324 @@
+{
+  "name": "Lead Agent System",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Get a Free Consultation",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name"
+            },
+            {
+              "fieldLabel": "Email"
+            },
+            {
+              "fieldLabel": "Phone"
+            },
+            {
+              "fieldLabel": "Company Name"
+            },
+            {
+              "fieldLabel": "Monthly Budget"
+            },
+            {
+              "fieldLabel": "What do you need help with?"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "44296e61-4bf6-4249-a096-397c447c8237",
+      "name": "On form submission",
+      "webhookId": "c950099b-9721-4433-8f13-fb03496330ee"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4e4e2720-231b-4f20-97dd-db3a1f97fa90",
+              "name": "prompt",
+              "value": "=You are a lead qualification expert. Based on this lead information, qualify them as HOT, WARM, or COLD and explain why in 2-3 sentences. Lead info: Name: {{ $('On form submission').item.json['Full Name'] }}, Company: {{ $('On form submission').item.json['Company Name'] }}, Budget: {{ $('On form submission').item.json.Budget }}, Need: {{ $('On form submission').item.json['What do you need help with?'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "529d1d68-2042-4fb9-a1fb-b6dc64ad102a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "My Groq Api key"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.prompt }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "fafb7f13-0db8-46b3-8ac7-0083209e5ba3",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1b2g6gU5wVjts7K6-G40aXeyDd1fwvT2lKJN3IJZah7Q",
+          "mode": "list",
+          "cachedResultName": "Leads Pipeline",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1b2g6gU5wVjts7K6-G40aXeyDd1fwvT2lKJN3IJZah7Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1b2g6gU5wVjts7K6-G40aXeyDd1fwvT2lKJN3IJZah7Q/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('On form submission').item.json['Full Name'] }}",
+            "Email": "={{ $('On form submission').item.json.Email }}",
+            "Phone": "={{ $('On form submission').item.json.Phone }}",
+            "Company": "={{ $('On form submission').item.json['Company Name'] }}",
+            "Budget": "={{ $('On form submission').item.json['Monthly Budget'] }}",
+            "Lead Quality": "={{ $('HTTP Request').item.json.choices[0].message.content }}",
+            "Need": "={{ $('On form submission').item.json['What do you need help with?'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Need",
+              "displayName": "Need",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Quality",
+              "displayName": "Lead Quality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        0
+      ],
+      "id": "04038bfb-c0c3-4639-8208-189837fae79e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9s3OHIbkOT10iAmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "Thank you For your Interest",
+        "message": "=Hi {{ $('On form submission').item.json['Full Name'] }}, thank you for reaching out. Based on your requirements, here is our assessment: {{ $('HTTP Request').item.json.choices[0].message.content }}. We will contact you shortly to discuss further.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        848,
+        0
+      ],
+      "id": "54e8cf81-c2b8-4221-a939-4157e54dde3a",
+      "name": "Send a message",
+      "webhookId": "89261d6b-6555-4d0a-9f30-6c36254cbd8e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eaWnYHlPHwh1Ests",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "sameerahmii331@gmail.com",
+        "subject": "=New Lead: {{ $('On form submission').item.json['Full Name'] }}",
+        "message": "=New lead received! Name: {{ $('On form submission').item.json['Full Name'] }} Email: {{ $('On form submission').item.json.Email }} Budget:{{ $('On form submission').item.json['Monthly Budget'] }} AI Assessment: {{ $('HTTP Request').item.json.choices[0].message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "19b05319-b6aa-4a18-9b10-88344f25746d",
+      "name": "Send a message1",
+      "webhookId": "bbd6ad80-649b-45b7-99d4-beee36625a47",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eaWnYHlPHwh1Ests",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "e8b7df89-1121-4993-9746-5428146e7aea",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e6464d770950a4d5a66863f2bcc182df3d6e7fab50753144ed5ffe36dc38e919"
+  },
+  "nodeGroups": [],
+  "id": "tqgrl8S2ndZZQRIj",
+  "tags": []
+}

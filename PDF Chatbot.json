@@ -1,0 +1,170 @@
+{
+  "name": "PDF Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bf1bcfe6-077c-4d53-8a81-163d5cb90827",
+      "name": "When chat message received",
+      "webhookId": "66bc72e4-70ec-4782-ab2f-1e884bae0564"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "ae46f93d-dd42-4d31-b455-602de9a86bbc",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "fileSelector": "C:\\Users\\Usewr\\.n8n-files\\SMB_University_120307_Networking_Fundamentals.pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "64e8f1b7-0f36-4634-9620-6b1cfcf7ee9c",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2fa7ba84-e041-45f1-b7ed-3af62e44bc97",
+              "name": "prompt",
+              "value": "=Answer this question based on the PDF content: {{ $('When chat message received').item.json.chatInput }} PDF Content: {{ $('Extract from File').item.json.text.slice(0, 3000) }}",
+              "type": "string"
+            },
+            {
+              "id": "02a60beb-abe4-4f03-86c9-443e26420b77",
+              "name": "pdftext",
+              "value": "={{ $('Extract from File').item.json.text.substring(0, 1500).replace(/[\\x00-\\x1F\\x7F]/g, ' ') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "cd4cf144-d2e5-4754-9c4b-0aabff8f7c6d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "My groq api key"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\"model\":\"llama-3.3-70b-versatile\",\"messages\":[{\"role\":\"system\",\"content\":\"Answer only from the provided PDF.\"},{\"role\":\"user\",\"content\":\"PDF: \" + $node[\"Extract from File\"].json.text + \" Question: \" + $node[\"When chat message received\"].json.chatInput}],\"temperature\":0.2} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        784,
+        -16
+      ],
+      "id": "a2b27fdc-654c-4731-834a-78331c8e07c9",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3778ec6d-8e53-4e13-bd10-d40895d7f374",
+  "meta": {
+    "instanceId": "e6464d770950a4d5a66863f2bcc182df3d6e7fab50753144ed5ffe36dc38e919"
+  },
+  "nodeGroups": [],
+  "id": "ppCBmt5XWWjz0E7J",
+  "tags": []
+}
