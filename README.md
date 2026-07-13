@@ -60,7 +60,11 @@ Automates customer data management with Google Sheets and email notifications.
 - Gmail API
 - Google Sheets API
 - Google OAuth2
-
+  
+## 🎥 Demo Videos
+- [PDF Agent System Demo](https://www.loom.com/share/f79cd8e45a274bb0a4702d3ae50a792f)
+- [Lead Generation Agent Demo](https://www.loom.com/share/74b8d631af8d430e9d9a80db6744a1ae)
+- [AI Customer Support Bot Demo](https://www.loom.com/share/f46cf63a7aae41d09febbead786f7c93)
 ## 📞 Contact
 Available for freelance work on Upwork and Fiverr.
-Email: sameerahmii331@gmail.com
+Email: same
